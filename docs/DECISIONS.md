@@ -32,9 +32,9 @@ This is an assumption; the brief does not define group behaviour.
 
 ## 4. `lastBrightness` stores the last non-zero brightness
 
-When a light turns off (or drops to 0%), its last non-zero brightness is stored as `lastBrightness`.
-When turned back on, it restores that `lastBrightness` (defaulting to 75% if none was recorded).
-A light is never ON at 0%.
+When a light turns off (or drops to 0%), its last non-zero brightness is stored as
+`lastBrightness`. When turned back on, it restores that `lastBrightness` (defaulting to
+75% if none was recorded). A light is never ON at 0%.
 
 ## 5. Drawer status title shows current state
 
@@ -45,19 +45,46 @@ The drawer header displays the current state ("On" / "Off") as the status title,
 The error toast features a manual close (×) button and also auto-dismisses after 4 seconds.
 Errors are state fields in `HomeScreenState` as required by the Horizon pattern.
 
-## 5. Touch targets are 48 dp
+## 7. Touch targets are 48 dp
 
 The brief asks for 44×44 pt (the iOS figure). The Android guideline of 48 dp is used; it
 satisfies both.
 
-## 6. Design tokens come from screenshots
+## 8. Design tokens come from screenshots
 
 The Figma file could not be opened. Colours were sampled from the two design screenshots
 in the project; sizes, spacing, radii and typography are estimates. The error toast and
 non-dimmable states come from screenshots that were only viewed, so their colours are
 estimated by eye. See `design-tokens.md`.
 
-## 7. Font is the system default
+## 9. Font is the system default
 
 The font family used in the design is unknown. The system default sans-serif (Roboto on
 most devices) is used, so no font files are bundled.
+
+## 10. Optimistic update with rollback to last CONFIRMED state
+
+The repository applies every change to the `StateFlow` immediately (optimistic UI), calls
+the service, and only on success stores the response as the new confirmed state. On failure
+it rolls back to the last confirmed state — not to "the state before this action" — so
+concurrent actions on other lights are never clobbered by a failed call.
+
+## 11. Brightness debounce: 300 ms, final value only
+
+Slider and swipe changes update the UI state instantly, but the service call is debounced
+with a 300 ms window: each new value cancels the pending call, so only the final value of
+a burst is sent. 300 ms matches the lower bound of the simulated network delay, so a
+settled value is never sent while a previous request is still in flight.
+
+## 12. Repository errors are returned, not streamed
+
+Repository operations are suspend functions returning `Result`. There is no error
+`SharedFlow`, no `Channel` and no error stream: the caller (the ViewModel) already knows
+which action failed and where it came from, so the error origin is known from the event.
+
+## 13. No UseCases: ViewModel talks to the repository directly
+
+The brief forbids speculative abstractions. With a single screen and one repository, a
+UseCase layer would add indirection without value. The ViewModel calls
+`LightsRepository` directly. If the app grows (multiple screens, transformations,
+composition of calls), UseCases can be introduced later without touching the UI.
