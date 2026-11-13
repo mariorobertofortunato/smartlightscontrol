@@ -1,17 +1,38 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-/docs
-/.idea
-.externalNativeBuild
-.cxx
+# Built application files
+*.apk
+*.aar
+*.ap_
+*.aab
+*.dex
+*.class
+
+# Generated build & cache directories
+build/
+app/build/
+.gradle/
+.kotlin/
+.externalNativeBuild/
+.cxx/
+captures/
+out/
+bin/
+
+# Local configuration & environment
 local.properties
+.DS_Store
+Thumbs.db
+*.log
+
+# IntelliJ IDEA / Android Studio
+*.iml
+.idea/workspace.xml
+.idea/shelf/
+.idea/caches/
+.idea/libraries/
+.idea/modules.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+.idea/deploymentTargetSelector.xml
+.idea/appInsightsSettings.xml
+.idea/AndroidProjectSystem.xml
+.idea/deviceManager.xml

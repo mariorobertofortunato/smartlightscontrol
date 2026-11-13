@@ -1,5 +1,12 @@
 # Default ignored files
 /shelf/
 /workspace.xml
-/docs
-/.idea
+/caches/
+/libraries/
+/modules.xml
+/navEditor.xml
+/assetWizardSettings.xml
+/deploymentTargetSelector.xml
+/appInsightsSettings.xml
+/AndroidProjectSystem.xml
+/deviceManager.xml
