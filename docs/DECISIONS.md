@@ -88,3 +88,11 @@ The brief forbids speculative abstractions. With a single screen and one reposit
 UseCase layer would add indirection without value. The ViewModel calls
 `LightsRepository` directly. If the app grows (multiple screens, transformations,
 composition of calls), UseCases can be introduced later without touching the UI.
+
+## 14. Horizon Pattern for state & event handling
+
+The presentation layer strictly follows the Horizon pattern (Compose-native MVI evolution).
+`HomeScreenContract.kt` defines `HomeScreenState` and `HomeScreenEvent`. `HomeScreenState` encapsulates
+all state and exposes `eventTunnel = { processEvent(it) }`. Composables access the event tunnel via
+`LocalHomeScreenEventTunnel` (CompositionLocal) without prop drilling. Errors (widget error vs drawer error)
+are modeled directly as state flags in `HomeScreenState` (no one-shot effect channels).
