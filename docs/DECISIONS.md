@@ -99,3 +99,8 @@ The presentation layer strictly follows the Horizon pattern (Compose-native MVI 
 all state and exposes `eventTunnel = { processEvent(it) }`. Composables access the event tunnel via
 `LocalHomeScreenEventTunnel` (CompositionLocal) without prop drilling. Errors (widget error vs drawer error)
 are modeled directly as state flags in `HomeScreenState` (no one-shot effect channels).
+
+## 15. Customizable failure rate (0% to 100%) with header cycle pill
+
+To facilitate testing and live demonstration of error states and rollback handling, `MockLightService` and `LightsRepository` support a configurable failure rate ranging from 0.0 (0%) to 1.0 (100%).
+An interactive **"Fail: X%"** pill in the top header (`HomeHeader`) cycles through preset rates (`0% ➔ 10% ➔ 50% ➔ 100% ➔ 0%`) on tap, providing immediate visual feedback and allowing reviewers to test error recovery and toast behaviors across different failure probabilities.

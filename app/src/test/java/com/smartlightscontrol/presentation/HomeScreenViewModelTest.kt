@@ -120,7 +120,7 @@ class HomeScreenViewModelTest {
     fun `TogglePower failure from drawer sets drawerError to true`() = testScope.runTest {
         val failingService = object : LightService {
             override suspend fun list(): List<Light> = MockLightService(failureRate = 0.0, delayMillisProvider = { 0L }).list()
-            override suspend fun get(id: String): Light = throw RuntimeException("Error")
+            override suspend fun get(id: String): Light = Light(id, "Bed light", true, true, 75, 75)
             override suspend fun setPower(id: String, isOn: Boolean): Light = throw RuntimeException("Error")
             override suspend fun setBrightness(id: String, value: Int): Light = throw RuntimeException("Error")
         }
@@ -146,7 +146,7 @@ class HomeScreenViewModelTest {
     fun `ChangeBrightness failure from drawer sets drawerError`() = testScope.runTest {
         val failingService = object : LightService {
             override suspend fun list(): List<Light> = MockLightService(failureRate = 0.0, delayMillisProvider = { 0L }).list()
-            override suspend fun get(id: String): Light = throw RuntimeException("Error")
+            override suspend fun get(id: String): Light = Light(id, "Bed light", true, true, 75, 75)
             override suspend fun setPower(id: String, isOn: Boolean): Light = throw RuntimeException("Error")
             override suspend fun setBrightness(id: String, value: Int): Light = throw RuntimeException("Error")
         }

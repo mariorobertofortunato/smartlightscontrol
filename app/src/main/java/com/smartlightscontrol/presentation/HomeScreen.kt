@@ -76,7 +76,7 @@ fun HomeScreenContent(
                 ) {
                     Column {
                         // Header Section
-                        HomeHeader()
+                        HomeHeader(failureRatePercent = state.failureRatePercent)
 
                         Spacer(modifier = Modifier.height(14.dp))
 

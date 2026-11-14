@@ -71,6 +71,23 @@ class LightsRepositoryImpl(
         }
     }
 
+    override suspend fun getLight(id: String): Result<Light> {
+        return try {
+            val fetched = service.get(id)
+            confirmedLights[fetched.id] = fetched
+            _lights.update { currentList ->
+                currentList.map { if (it.id == fetched.id) fetched else it }
+            }
+            Result.success(fetched)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override fun setFailureRate(rate: Double) {
+        (service as? MockLightService)?.failureRate = rate.coerceIn(0.0, 1.0)
+    }
+
     override suspend fun setPower(id: String, isOn: Boolean): Result<Light> {
         // 1. Optimistic update
         _lights.update { currentList ->

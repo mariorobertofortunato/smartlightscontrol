@@ -75,13 +75,24 @@ class HomeScreenViewModel(
             is HomeScreenEvent.DismissError -> {
                 clearError()
             }
+
+            is HomeScreenEvent.CycleFailureRate -> {
+                val nextRate = when (_state.value.failureRate) {
+                    0.0 -> 0.1
+                    0.1 -> 0.5
+                    0.5 -> 1.0
+                    else -> 0.0
+                }
+                repository.setFailureRate(nextRate)
+                _state.update { it.copy(failureRate = nextRate) }
+            }
         }
     }
 
     private fun handleTogglePower(id: String) {
         val isDrawerOrigin = _state.value.isDrawerOpen && _state.value.drawerLightId == id
-        val targetLight = _state.value.lights.firstOrNull { it.id == id } ?: return
-        val newPower = !targetLight.isOn
+        val targetLight = _state.value.lights.firstOrNull { id == "group_all" || it.id == id } ?: return
+        val newPower = if (id == "group_all") !_state.value.lights.all { it.isOn } else !targetLight.isOn
 
         viewModelScope.launch {
             val result = repository.setPower(id, newPower)
@@ -106,15 +117,27 @@ class HomeScreenViewModel(
 
     private fun handleOpenDrawer(id: String) {
         val exists = _state.value.lights.any { it.id == id }
-        if (exists) {
-            _state.update {
-                it.copy(
-                    isDrawerOpen = true,
-                    drawerLightId = id
-                )
-            }
-        } else {
+        if (!exists) {
             setError(isDrawerOrigin = false)
+            return
+        }
+
+        // Optimistically open drawer instantly
+        _state.update {
+            it.copy(
+                isDrawerOpen = true,
+                drawerLightId = id
+            )
+        }
+
+        // Background sync / verify fetch
+        viewModelScope.launch {
+            val result = repository.getLight(id)
+            if (result.isFailure && _state.value.isDrawerOpen && _state.value.drawerLightId == id) {
+                // If background fetch fails, close drawer and show error toast
+                _state.update { it.copy(isDrawerOpen = false, drawerLightId = null) }
+                setError(isDrawerOrigin = false)
+            }
         }
     }
 

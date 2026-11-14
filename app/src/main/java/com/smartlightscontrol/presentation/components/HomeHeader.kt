@@ -1,9 +1,9 @@
 package com.smartlightscontrol.presentation.components
 
-import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,16 +29,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.smartlightscontrol.R
+import com.smartlightscontrol.presentation.HomeScreenEvent
+import com.smartlightscontrol.presentation.LocalHomeScreenEventTunnel
+import com.smartlightscontrol.ui.theme.ErrorContainer
+import com.smartlightscontrol.ui.theme.OnErrorContainer
 import com.smartlightscontrol.ui.theme.SurfacePill
 import com.smartlightscontrol.ui.theme.TextPrimary
 import com.smartlightscontrol.ui.theme.TextSecondary
 
 @Composable
 fun HomeHeader(
+    failureRatePercent: Int,
     modifier: Modifier = Modifier
 ) {
+    val eventTunnel = LocalHomeScreenEventTunnel.current
     val context = LocalContext.current
     val houseBitmap = remember(context) {
         BitmapFactory.decodeResource(context.resources, R.raw.home_lights_selector_image)
@@ -69,8 +77,32 @@ fun HomeHeader(
                 )
             }
 
-            // Right: "Pair buttons" pill & 3 dots menu
+            // Right: Failure Rate Cycle Pill, "Pair buttons" pill & 3 dots menu
             Row(verticalAlignment = Alignment.CenterVertically) {
+                // Failure Rate Cycle Pill (0%, 10%, 50%, 100%)
+                Box(
+                    modifier = Modifier
+                        .height(32.dp)
+                        .clip(RoundedCornerShape(50))
+                        .background(if (failureRatePercent > 0) ErrorContainer else SurfacePill)
+                        .clickable {
+                            eventTunnel(HomeScreenEvent.CycleFailureRate)
+                        }
+                        .padding(horizontal = 10.dp, vertical = 6.dp)
+                        .semantics {
+                            contentDescription = "Failure rate set to $failureRatePercent percent. Tap to cycle."
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Fail: $failureRatePercent%",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = OnErrorContainer
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
                 Box(
                     modifier = Modifier
                         .height(32.dp)

@@ -10,6 +10,7 @@ sealed interface HomeScreenEvent {
     data class OpenDrawer(val id: String) : HomeScreenEvent
     object CloseDrawer : HomeScreenEvent
     object DismissError : HomeScreenEvent
+    object CycleFailureRate : HomeScreenEvent
 }
 
 data class HomeScreenState(
@@ -20,6 +21,7 @@ data class HomeScreenState(
     val widgetError: Boolean = false,
     val drawerError: Boolean = false,
     val errorMessage: String? = null,
+    val failureRate: Double = 0.1,
     val eventTunnel: (HomeScreenEvent) -> Unit = {}
 ) {
     val selectedLight: Light?
@@ -30,6 +32,9 @@ data class HomeScreenState(
 
     val hasError: Boolean
         get() = widgetError || drawerError
+
+    val failureRatePercent: Int
+        get() = (failureRate * 100).toInt()
 }
 
 val LocalHomeScreenEventTunnel = staticCompositionLocalOf<(HomeScreenEvent) -> Unit> {
