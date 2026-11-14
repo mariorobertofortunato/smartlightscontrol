@@ -34,6 +34,7 @@ import com.smartlightscontrol.presentation.components.EntranceWindowCard
 import com.smartlightscontrol.presentation.components.ErrorToast
 import com.smartlightscontrol.presentation.components.ExternalCarouselCard
 import com.smartlightscontrol.presentation.components.HomeHeader
+import com.smartlightscontrol.presentation.components.LightDrawer
 import com.smartlightscontrol.presentation.components.LightSelectorRow
 import com.smartlightscontrol.presentation.components.LightWidget
 import com.smartlightscontrol.presentation.components.NightTimeCard
@@ -134,7 +135,7 @@ fun HomeScreenContent(
                     AssistantInputBar(modifier = Modifier.padding(top = 12.dp))
                 }
 
-                // Error Toast Overlay
+                // Error Toast Overlay for Main Widget Errors
                 AnimatedVisibility(
                     visible = state.widgetError && !state.isDrawerOpen,
                     enter = fadeIn(),
@@ -145,6 +146,9 @@ fun HomeScreenContent(
                 ) {
                     ErrorToast(errorMessage = state.errorMessage)
                 }
+
+                // Modal Bottom Sheet Light Drawer
+                LightDrawer(state = state)
             }
         }
     }
@@ -236,6 +240,24 @@ fun HomeScreenErrorStatePreview() {
                 selectedLightId = "bed_light",
                 widgetError = true,
                 errorMessage = "Something went wrong · Try again later"
+            )
+        )
+    }
+}
+
+@Preview(name = "Home - Light Drawer Open")
+@Composable
+fun HomeScreenDrawerOpenPreview() {
+    val mockLights = listOf(
+        Light("bed_light", "Bed light", dimmable = true, isOn = true, brightness = 75, lastBrightness = 75)
+    )
+    SmartLightsControlTheme {
+        HomeScreenContent(
+            state = HomeScreenState(
+                lights = mockLights,
+                selectedLightId = "bed_light",
+                isDrawerOpen = true,
+                drawerLightId = "bed_light"
             )
         )
     }
