@@ -156,6 +156,7 @@ class LightsRepositoryImpl(
                 }
                 result = Result.success(updated)
             } catch (e: Exception) {
+                if (e is kotlinx.coroutines.CancellationException) throw e
                 // Rollback affected light to confirmed state
                 _lights.update { currentList ->
                     currentList.map { light ->
@@ -167,8 +168,12 @@ class LightsRepositoryImpl(
         }
 
         debounceJobs[id] = job
-        job.join()
+        try {
+            job.join()
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            return Result.failure(e)
+        }
 
-        return result ?: Result.failure(IllegalStateException("Debounced job was cancelled"))
+        return result ?: Result.failure(kotlinx.coroutines.CancellationException("Debounced job was superseded"))
     }
 }

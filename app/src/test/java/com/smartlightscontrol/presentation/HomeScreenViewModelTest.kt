@@ -240,6 +240,30 @@ class HomeScreenViewModelTest {
     }
 
     @Test
+    fun `subsequent user action automatically dismisses active error toast`() = testScope.runTest {
+        val mockService = MockLightService(failureRate = 0.0, delayMillisProvider = { 0L })
+        val repository = createRepository(mockService)
+        val viewModel = HomeScreenViewModel(repository, autoDismissDelayMs = 4000L)
+        testDispatcher.scheduler.runCurrent()
+
+        // Trigger an error
+        viewModel.state.value.eventTunnel(HomeScreenEvent.OpenDrawer("invalid_id"))
+        testDispatcher.scheduler.runCurrent()
+        assertTrue(viewModel.state.value.hasError)
+
+        // Perform a new user action (SelectLight)
+        viewModel.state.value.eventTunnel(HomeScreenEvent.SelectLight("entrance_light"))
+        testDispatcher.scheduler.runCurrent()
+
+        // Verify active error was automatically dismissed
+        val state = viewModel.state.value
+        assertFalse(state.hasError)
+        assertFalse(state.widgetError)
+        assertNull(state.errorMessage)
+        assertEquals("entrance_light", state.selectedLightId)
+    }
+
+    @Test
     fun `auto dismiss error clears error after specified delay`() = testScope.runTest {
         val mockService = MockLightService(failureRate = 0.0, delayMillisProvider = { 0L })
         val repository = createRepository(mockService)

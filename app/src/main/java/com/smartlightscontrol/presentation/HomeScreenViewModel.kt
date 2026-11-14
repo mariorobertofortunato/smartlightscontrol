@@ -46,6 +46,11 @@ class HomeScreenViewModel(
     }
 
     private fun processEvent(event: HomeScreenEvent) {
+        // Automatically dismiss any active error banner as soon as the user triggers a new action
+        if (event !is HomeScreenEvent.DismissError && _state.value.hasError) {
+            clearError()
+        }
+
         when (event) {
             is HomeScreenEvent.SelectLight -> {
                 _state.update { it.copy(selectedLightId = event.id) }
@@ -80,7 +85,8 @@ class HomeScreenViewModel(
 
         viewModelScope.launch {
             val result = repository.setPower(id, newPower)
-            if (result.isFailure) {
+            val exception = result.exceptionOrNull()
+            if (result.isFailure && exception !is kotlinx.coroutines.CancellationException) {
                 setError(isDrawerOrigin)
             }
         }
@@ -91,7 +97,8 @@ class HomeScreenViewModel(
 
         viewModelScope.launch {
             val result = repository.setBrightness(id, brightness)
-            if (result.isFailure) {
+            val exception = result.exceptionOrNull()
+            if (result.isFailure && exception !is kotlinx.coroutines.CancellationException) {
                 setError(isDrawerOrigin)
             }
         }

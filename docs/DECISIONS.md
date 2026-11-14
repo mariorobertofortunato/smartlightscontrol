@@ -42,8 +42,11 @@ The drawer header displays the current state ("On" / "Off") as the status title,
 
 ## 6. Error toast dismiss behaviour
 
-The error toast features a manual close (×) button and also auto-dismisses after 4 seconds.
-Errors are state fields in `HomeScreenState` as required by the Horizon pattern.
+The error toast features:
+- Manual close (×) button sending `HomeScreenEvent.DismissError`.
+- Auto-dismiss after 4 seconds if untouched.
+- Immediate dismissal on any subsequent user interaction (tap, swipe, light selection) to avoid displaying a stale error over a successful new action.
+Errors are state fields (`widgetError`, `drawerError`) in `HomeScreenState` as required by the Horizon pattern.
 
 ## 7. Touch targets are 48 dp
 
