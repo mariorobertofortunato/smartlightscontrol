@@ -110,14 +110,26 @@ fun LightWidget(
                 )
             }
             .pointerInput(light.id) {
+                var totalDrag = 0f
+                var hasToggled = false
                 detectHorizontalDragGestures(
                     onDragStart = { offset ->
+                        totalDrag = 0f
+                        hasToggled = false
                         val touchRatio = (offset.x / cardWidthPx).coerceIn(0f, 1f)
                         dragAccumulatorPx = touchRatio * cardWidthPx
                         if (currentLight.dimmable) {
                             val newBrightness = (touchRatio * 100).toInt().coerceIn(0, 100)
                             currentEventTunnel(HomeScreenEvent.ChangeBrightness(currentLight.id, newBrightness))
                         }
+                    },
+                    onDragEnd = {
+                        hasToggled = false
+                        totalDrag = 0f
+                    },
+                    onDragCancel = {
+                        hasToggled = false
+                        totalDrag = 0f
                     },
                     onHorizontalDrag = { change, dragAmount ->
                         change.consume()
@@ -126,10 +138,15 @@ fun LightWidget(
                             val newBrightness = ((dragAccumulatorPx / cardWidthPx) * 100).toInt().coerceIn(0, 100)
                             currentEventTunnel(HomeScreenEvent.ChangeBrightness(currentLight.id, newBrightness))
                         } else {
-                            if (dragAmount > 15f && !light.isOn) {
-                                currentEventTunnel(HomeScreenEvent.TogglePower(currentLight.id))
-                            } else if (dragAmount < -15f && light.isOn) {
-                                currentEventTunnel(HomeScreenEvent.TogglePower(currentLight.id))
+                            if (!hasToggled) {
+                                totalDrag += dragAmount
+                                if (totalDrag > 25f && !currentLight.isOn) {
+                                    hasToggled = true
+                                    currentEventTunnel(HomeScreenEvent.TogglePower(currentLight.id))
+                                } else if (totalDrag < -25f && currentLight.isOn) {
+                                    hasToggled = true
+                                    currentEventTunnel(HomeScreenEvent.TogglePower(currentLight.id))
+                                }
                             }
                         }
                     }

@@ -5,6 +5,8 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeRight
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.smartlightscontrol.domain.Light
 import com.smartlightscontrol.ui.theme.SmartLightsControlTheme
@@ -75,5 +77,36 @@ class HomeScreenUiTest {
         // Verify that the error toast message is displayed on screen
         composeTestRule.onNodeWithText("Something went wrong").assertIsDisplayed()
         composeTestRule.onNodeWithText("Try again later").assertIsDisplayed()
+    }
+
+    @Test
+    fun nonDimmableWidgetSwipeDispatchesTogglePowerEvent() {
+        var toggledId: String? = null
+        val lights = listOf(
+            Light("entrance_light", "Entrance light", dimmable = false, isOn = false, brightness = 0, lastBrightness = 100)
+        )
+
+        composeTestRule.setContent {
+            SmartLightsControlTheme {
+                HomeScreenContent(
+                    state = HomeScreenState(
+                        lights = lights,
+                        selectedLightId = "entrance_light",
+                        eventTunnel = { event ->
+                            if (event is HomeScreenEvent.TogglePower) {
+                                toggledId = event.id
+                            }
+                        }
+                    )
+                )
+            }
+        }
+
+        composeTestRule.onNodeWithText("Entrance light").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Entrance light, Off").performTouchInput {
+            swipeRight()
+        }
+
+        assertEquals("entrance_light", toggledId)
     }
 }
