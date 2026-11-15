@@ -1,0 +1,5 @@
+- Adjust colors and possibly font to actual requirements (font is unknown, while colors can be fetched from figma, tha agent couldnt tell which color they are with certainty)
+- UI is quite OK, should carry out a meticoulus check of colors and layout measures and sizes (ex: top / bottom home image, bottom assistant, icons, corner sizes, position of chevron --->>> FIGMA should have everything, maybe we could screenshot everything and feed it to the agent)
+- specify in readme the main-only branch approach
+- possibly try and find a way for the bulb to reflect the dimmable light intensity - and also apply the same for the widget indicator - CONFIRM THAT THIS IS NOT ALREADY IN REQUIREMENTS
+- the bulb image assets are different in size, should unify for better UX

@@ -1,0 +1,32 @@
+# First obsv
+- Android only, Kotlin, Jetpack Compose
+- main flows:
+	- Dimmable
+	- Non-Dimmable
+- image assets are provided
+- basic ark:
+	- presentation
+		- HomeScreen
+		- HomeScreenViewModel
+		- DI koin
+			- MainScreenViewModel
+			- LigthService
+			- bind LightsRepository
+	- domain
+		- models
+			- Ligth(id,name,...)
+		- LightsRepository
+	- data
+		- LigthService(interface) 
+		- MockLigthService
+		- LightsRepositoryImpl(ligthService: LigthService)
+
+- Open Points:
+	- ~~how to feed figma screens to agent? -> Figma MCP on Android Studio?~~ -> not working because of edit restrictions
+	- how to select different ligths?
+		- we could think of enabling the top house image as a whole system representaion of the avilable ligths -> the user taps the relative ligth they want to control (maybe a bit too small?)
+		- Alternatively a simple dropdown selector on the side , and the relative ligth on the image is highlighted
+		- It could also be a dynamically populated lsit that shows the last four used ligths (but we should still think of a wway of showing all the ligths available)
+	- how to manage the errors with optimistic UI and rollback?
+	- the sample service itnerface cite the Promise return type -> we'll use coroutines (Deferred? mmmh, not parallel calls so maybe just suspend fun)
+	- UseCases or direct repo integration in viewmodel?
