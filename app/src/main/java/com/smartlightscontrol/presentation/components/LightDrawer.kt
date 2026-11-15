@@ -30,7 +30,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -124,11 +123,12 @@ fun LightDrawerContent(
         modifier = modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .padding(horizontal = 20.dp, vertical = 8.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp) // Optimized padding matching Figma
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp) // Optimized spacing matching Figma 16dp
         ) {
             // Header Info: Light Name (subtitle) & Status Title ("On" / "Off" per Decision #5)
             Column(
@@ -147,8 +147,6 @@ fun LightDrawerContent(
                     color = TextPrimary
                 )
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
 
             // Bulb Panel Visual
             Box(
@@ -172,11 +170,12 @@ fun LightDrawerContent(
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
-
             // Controls Section: Brightness Slider vs Non-Dimmable Info
             if (light.dimmable) {
-                Column(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -193,8 +192,6 @@ fun LightDrawerContent(
                             color = TextPrimary
                         )
                     }
-
-                    Spacer(modifier = Modifier.height(4.dp))
 
                     // Custom Slider matching Figma design tokens & screenshot
                     Slider(
@@ -278,8 +275,6 @@ fun LightDrawerContent(
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
-
             // Toggle Power Button (Full-width pill button, 48dp height touch target)
             val isButtonOn = light.isOn
             Button(
@@ -303,8 +298,6 @@ fun LightDrawerContent(
                     style = MaterialTheme.typography.titleMedium
                 )
             }
-
-            Spacer(modifier = Modifier.height(12.dp))
         }
 
         // Drawer Error Toast Overlay
@@ -330,13 +323,11 @@ fun LightDrawerContent(
 fun LightDrawerDimmableOnPreview() {
     SmartLightsControlTheme {
         CompositionLocalProvider(LocalHomeScreenEventTunnel provides {}) {
-            Surface(color = SurfaceSheet) {
-                LightDrawerContent(
-                    light = Light("bed_light", "Bed light", dimmable = true, isOn = true, brightness = 75, lastBrightness = 75),
-                    drawerError = false,
-                    errorMessage = null
-                )
-            }
+            LightDrawerContent(
+                light = Light("bed_light", "Bed light", dimmable = true, isOn = true, brightness = 75, lastBrightness = 75),
+                drawerError = false,
+                errorMessage = null
+            )
         }
     }
 }
@@ -346,13 +337,11 @@ fun LightDrawerDimmableOnPreview() {
 fun LightDrawerDimmableOffPreview() {
     SmartLightsControlTheme {
         CompositionLocalProvider(LocalHomeScreenEventTunnel provides {}) {
-            Surface(color = SurfaceSheet) {
-                LightDrawerContent(
-                    light = Light("bed_light", "Bed light", dimmable = true, isOn = false, brightness = 0, lastBrightness = 75),
-                    drawerError = false,
-                    errorMessage = null
-                )
-            }
+            LightDrawerContent(
+                light = Light("bed_light", "Bed light", dimmable = true, isOn = false, brightness = 0, lastBrightness = 75),
+                drawerError = false,
+                errorMessage = null
+            )
         }
     }
 }
@@ -362,13 +351,11 @@ fun LightDrawerDimmableOffPreview() {
 fun LightDrawerNonDimmableOnPreview() {
     SmartLightsControlTheme {
         CompositionLocalProvider(LocalHomeScreenEventTunnel provides {}) {
-            Surface(color = SurfaceSheet) {
-                LightDrawerContent(
-                    light = Light("group_all", "All the lights in the house", dimmable = false, isOn = true, brightness = 100, lastBrightness = 100),
-                    drawerError = false,
-                    errorMessage = null
-                )
-            }
+            LightDrawerContent(
+                light = Light("group_all", "All the lights in the house", dimmable = false, isOn = true, brightness = 100, lastBrightness = 100),
+                drawerError = false,
+                errorMessage = null
+            )
         }
     }
 }
@@ -378,13 +365,11 @@ fun LightDrawerNonDimmableOnPreview() {
 fun LightDrawerNonDimmableOffPreview() {
     SmartLightsControlTheme {
         CompositionLocalProvider(LocalHomeScreenEventTunnel provides {}) {
-            Surface(color = SurfaceSheet) {
-                LightDrawerContent(
-                    light = Light("entrance_light", "Entrance light", dimmable = false, isOn = false, brightness = 0, lastBrightness = 100),
-                    drawerError = false,
-                    errorMessage = null
-                )
-            }
+            LightDrawerContent(
+                light = Light("entrance_light", "Entrance light", dimmable = false, isOn = false, brightness = 0, lastBrightness = 100),
+                drawerError = false,
+                errorMessage = null
+            )
         }
     }
 }
@@ -394,13 +379,11 @@ fun LightDrawerNonDimmableOffPreview() {
 fun LightDrawerErrorStatePreview() {
     SmartLightsControlTheme {
         CompositionLocalProvider(LocalHomeScreenEventTunnel provides {}) {
-            Surface(color = SurfaceSheet) {
-                LightDrawerContent(
-                    light = Light("bed_light", "Bed light", dimmable = true, isOn = true, brightness = 100, lastBrightness = 100),
-                    drawerError = true,
-                    errorMessage = "Something went wrong · Try again later"
-                )
-            }
+            LightDrawerContent(
+                light = Light("bed_light", "Bed light", dimmable = true, isOn = true, brightness = 100, lastBrightness = 100),
+                drawerError = true,
+                errorMessage = "Something went wrong · Try again later"
+            )
         }
     }
 }

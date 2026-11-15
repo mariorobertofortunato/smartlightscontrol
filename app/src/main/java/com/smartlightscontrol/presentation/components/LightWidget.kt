@@ -2,13 +2,12 @@ package com.smartlightscontrol.presentation.components
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,7 +19,7 @@ import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -36,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.semantics.Role
@@ -86,13 +86,14 @@ fun LightWidget(
     var cardWidthPx by remember { mutableFloatStateOf(1f) }
     var dragAccumulatorPx by remember { mutableFloatStateOf(0f) }
 
-    val cornerRadius = 10.dp
+    val cornerRadius = 10.dp // Inner card radius nesting inside 16.dp container
 
     Box(
         modifier = modifier
             .height(107.dp)
             .clip(RoundedCornerShape(cornerRadius))
             .background(WidgetTrack)
+            .border(1.dp, Color(0xFF2A3237), RoundedCornerShape(cornerRadius))
             .onGloballyPositioned { coordinates ->
                 cardWidthPx = coordinates.size.width.toFloat().coerceAtLeast(1f)
             }
@@ -125,9 +126,9 @@ fun LightWidget(
                             val newBrightness = ((dragAccumulatorPx / cardWidthPx) * 100).toInt().coerceIn(0, 100)
                             currentEventTunnel(HomeScreenEvent.ChangeBrightness(currentLight.id, newBrightness))
                         } else {
-                            if (dragAmount > 15f && !currentLight.isOn) {
+                            if (dragAmount > 15f && !light.isOn) {
                                 currentEventTunnel(HomeScreenEvent.TogglePower(currentLight.id))
-                            } else if (dragAmount < -15f && currentLight.isOn) {
+                            } else if (dragAmount < -15f && light.isOn) {
                                 currentEventTunnel(HomeScreenEvent.TogglePower(currentLight.id))
                             }
                         }
@@ -145,50 +146,48 @@ fun LightWidget(
             )
         }
 
-        // Widget Content Layout
-        Column(
+        // Content Layout
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 12.dp, vertical = 10.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+                .padding(vertical = 10.dp)
         ) {
-            // Top Row: Bulb Icon & Drawer Arrow
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            // Top-Left: Bulb Icon with left padding
+            Icon(
+                imageVector = Icons.Default.Lightbulb,
+                contentDescription = null,
+                tint = if (light.isOn) WidgetIconOn else WidgetIconOff,
+                modifier = Modifier
+                    .size(24.dp)
+                    .align(Alignment.TopStart)
+                    .padding(start = 12.dp)
+            )
+
+            // Center-Right: Chevron touch target Box flush against right edge with centered icon
+            Box(
+                modifier = Modifier
+                    .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
+                    .clip(RoundedCornerShape(50))
+                    .clickable {
+                        eventTunnel(HomeScreenEvent.OpenDrawer(light.id))
+                    }
+                    .align(Alignment.CenterEnd),
+                contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Default.Lightbulb,
+                    imageVector = Icons.Default.ChevronRight,
                     contentDescription = null,
-                    tint = if (light.isOn) WidgetIconOn else WidgetIconOff,
-                    modifier = Modifier.size(24.dp)
+                    tint = TextOnWidget,
+                    modifier = Modifier.size(20.dp)
                 )
-
-                // Drawer Open Arrow Button with minimum 48x48 dp touch target
-                Box(
-                    modifier = Modifier
-                        .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
-                        .clip(RoundedCornerShape(50))
-                        .clickable {
-                            eventTunnel(HomeScreenEvent.OpenDrawer(light.id))
-                        }
-                        .semantics {
-                            contentDescription = "Open settings for ${light.name}"
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = null,
-                        tint = TextOnWidget,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
             }
 
-            // Bottom Column: Name & Status
-            Column {
+            // Bottom-Left: Name & Status with left padding
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(start = 12.dp)
+            ) {
                 Text(
                     text = light.name,
                     style = MaterialTheme.typography.titleMedium,
@@ -196,7 +195,7 @@ fun LightWidget(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                Spacer(modifier = Modifier.height(2.dp))
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = statusText,
                     style = MaterialTheme.typography.bodySmall,

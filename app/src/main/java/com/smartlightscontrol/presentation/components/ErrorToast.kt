@@ -7,11 +7,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,17 +42,17 @@ fun ErrorToast(
 
     Row(
         modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(10.dp))
+            // Removed fillMaxWidth() so toast is a floating card with proper width per Figma screenshot
+            .clip(RoundedCornerShape(16.dp))
             .background(ErrorContainer)
             .padding(horizontal = 16.dp, vertical = 12.dp)
             .semantics {
                 contentDescription = errorMessage ?: "Error banner"
             },
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(modifier = Modifier.weight(1f)) {
+        Column(modifier = Modifier.weight(1f, fill = false)) {
             Text(
                 text = "Something went wrong",
                 style = MaterialTheme.typography.titleMedium,
@@ -65,25 +66,32 @@ fun ErrorToast(
             )
         }
 
-        // Close Button with 48x48 dp touch target
+        // Close Button with minimum 48x48 dp touch target wrapping a solid white circular badge with dark red close icon
         Box(
             modifier = Modifier
-                .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
-                .clip(RoundedCornerShape(50))
-                .clickable {
-                    eventTunnel(HomeScreenEvent.DismissError)
-                }
-                .semantics {
-                    contentDescription = "Dismiss error"
-                },
+                .sizeIn(minWidth = 48.dp, minHeight = 48.dp),
             contentAlignment = Alignment.Center
         ) {
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = null,
-                tint = OnErrorContainer,
-                modifier = Modifier.size(20.dp)
-            )
+            Box(
+                modifier = Modifier
+                    .size(28.dp)
+                    .clip(CircleShape)
+                    .background(Color.White) // Solid white circular badge per Figma screenshot
+                    .clickable {
+                        eventTunnel(HomeScreenEvent.DismissError)
+                    }
+                    .semantics {
+                        contentDescription = "Dismiss error"
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = null,
+                    tint = ErrorContainer, // Dark red icon inside white circle
+                    modifier = Modifier.size(16.dp)
+                )
+            }
         }
     }
 }
@@ -92,6 +100,6 @@ fun ErrorToast(
 @Composable
 fun ErrorToastPreview() {
     SmartLightsControlTheme {
-        ErrorToast(errorMessage = "Something went wrong · Try again later")
+        ErrorToast(errorMessage = "Something went wrong · Test")
     }
 }
